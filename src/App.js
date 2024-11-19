@@ -53,7 +53,7 @@ function reducer(state, action) {
       return {
         ...state,
         balance:
-          state.balance < WITHDRAW_AMOUNT
+          state.balance < action.payload
             ? state.balance
             : state.balance - action.payload,
       };
