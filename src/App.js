@@ -21,7 +21,7 @@ INSTRUCTIONS / CONSIDERATIONS:
 
 const DEPOSIT_AMOUNT = 150;
 const WITHDRAW_AMOUNT = 50;
-const LOAN_AMOUNT = 5000;
+const LOAN_AMOUNT = 5001;
 
 const initialState = {
   balance: 0,
@@ -61,21 +61,25 @@ function reducer(state, action) {
     case "requestLoan":
       return {
         ...state,
-        balance: state.hasLoan ? state.balance : state.balance + LOAN_AMOUNT,
-        loan: LOAN_AMOUNT,
+        balance: state.hasLoan ? state.balance : state.balance + action.payload,
+        loan: action.payload,
         hasLoan: true,
       };
 
     case "payLoan":
       return {
         ...state,
-        balance: state.hasLoan ? state.balance - LOAN_AMOUNT : state.balance,
+        balance: state.hasLoan ? state.balance - state.loan : state.balance,
         loan: state.hasLoan ? 0 : state.loan,
         hasLoan: false,
       };
 
     case "closeAccount":
-      return {};
+      if (state.balance !== 0 || state.hasLoan !== false) {
+        return state;
+      }
+
+      return initialState;
 
     default:
       throw new Error("Action unknown");
@@ -83,7 +87,7 @@ function reducer(state, action) {
 }
 
 export default function App() {
-  const [{ balance, loan, isActive, hasLoan }, dispatch] = useReducer(
+  const [{ balance, loan, isActive }, dispatch] = useReducer(
     reducer,
     initialState
   );
@@ -127,7 +131,7 @@ export default function App() {
       <p>
         <button
           onClick={() => {
-            dispatch({ type: "requestLoan" });
+            dispatch({ type: "requestLoan", payload: LOAN_AMOUNT });
           }}
           disabled={!isActive}
         >
